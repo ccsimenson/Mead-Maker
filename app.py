@@ -10,7 +10,7 @@ def main_menu():
     Display the main menu of the mead-making app.
     """
     while True:
-        choice = input("Select an option (1-3): ")
+        choice = input("Select an option (1-4): ")
         
         if choice == "1":
             abv()
