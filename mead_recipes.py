@@ -1,7 +1,8 @@
 import requests
+import os
 
-# Replace with your own YouTube Data API key
-YOUTUBE_API_KEY = "AIzaSyBBvVIzkFgrSaT_l4qTmRzODRGeFcA3llQ"
+# YouTube Data API key from environment variable
+YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY", "AIzaSyBBvVIzkFgrSaT_l4qTmRzODRGeFcA3llQ")
 
 def search_youtube(query, max_results=5):
     """
@@ -14,10 +15,7 @@ def search_youtube(query, max_results=5):
     Returns:
     list: A list of video titles and URLs.
     """
-    # YouTube Data API endpoint for search
     url = "https://www.googleapis.com/youtube/v3/search"
-    
-    # Parameters for the API request
     params = {
         "part": "snippet",
         "q": query,
@@ -27,18 +25,21 @@ def search_youtube(query, max_results=5):
     }
     
     try:
-        # Make the API request
-        response = requests.get(url, params=params)
-        response.raise_for_status()  # Raise an error for bad status codes
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
         data = response.json()
         
-        # Extract video details
+        if "error" in data:
+            error_message = data["error"].get("message", "Unknown error occurred.")
+            print(f"YouTube API Error: {error_message}")
+            return []
+        
         videos = []
         for item in data.get("items", []):
             video_id = item["id"]["videoId"]
             title = item["snippet"]["title"]
-            url = f"https://www.youtube.com/watch?v={video_id}"
-            videos.append({"title": title, "url": url})
+            video_url = f"https://www.youtube.com/watch?v={video_id}"
+            videos.append({"title": title, "url": video_url})
         
         return videos
     
@@ -53,6 +54,10 @@ def youtube_search_feature():
     print("\n--- YouTube Mead Recipe Search ---")
     query = input("Enter a search term (e.g., 'mead recipe'): ")
     
+    if not query:
+        print("Search term cannot be empty. Please try again.")
+        return
+    
     print(f"\nSearching YouTube for '{query}'...")
     videos = search_youtube(query)
     
@@ -63,6 +68,29 @@ def youtube_search_feature():
             print(f"   Link: {video['url']}")
     else:
         print("No results found. Please try a different search term.")
+
+def abv_calculator():
+    """
+    Prompt user for Original Gravity (OG) and Final Gravity (FG) readings,
+    calculate the ABV, and print the result.
+    """
+    def calculate_abv(og, fg):
+        abv = (og - fg) * 131.25
+        return round(abv, 2)
+
+    try:
+        ogr = float(input("Original Gravity Reading: "))
+        fgr = float(input("Enter Final Gravity Reading: "))
+        abv_result = calculate_abv(ogr, fgr)
+        print(f"ABV: {abv_result}%")
+    except ValueError:
+        print("Invalid input. Please enter numeric values.")
+
+def honey_water_calculator():
+    """
+    Placeholder function for Honey-to-Water Ratio Calculator.
+    """
+    print("Honey-to-Water Ratio Calculator coming soon...")
 
 def main_menu():
     """
@@ -78,9 +106,9 @@ def main_menu():
         choice = input("Select an option (1-4): ")
         
         if choice == "1":
-            abv_calculator()  # Assuming this function is already defined
+            abv_calculator()
         elif choice == "2":
-            honey_water_calculator()  # Assuming this function is already defined
+            honey_water_calculator()
         elif choice == "3":
             youtube_search_feature()
         elif choice == "4":
