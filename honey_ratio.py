@@ -69,32 +69,33 @@ def honey_water_calculator():
     print(f"Honey Required: {honey_amount:.2f} liters")
     print(f"Water Required: {water_amount:.2f} liters")
 
-def main_menu():
-    """
-    Display the main menu of the mead-making app.
-    """
-    while True:
-        print("\n=== Mead Making App ===")
-        print("1. Calculate ABV")
-        print("2. Honey-to-Water Ratio Calculator")
-        print("3. Mead Recipe Guide")
-        print("4. Exit")
+#def main_menu():
+#   """
+# 
+#   Display the main menu of the mead-making app.
+#   """
+#   while True:
+#       print("\n=== Mead Making App ===")
+#       print("1. Calculate ABV")
+#       print("2. Honey-to-Water Ratio Calculator")
+#       print("3. Mead Recipe Guide")
+#       print("4. Exit")
+#       
+#       choice = input("Select an option (1-4): ")
         
-        choice = input("Select an option (1-4): ")
-        
-        if choice == "1":
-            abv_calculator()  # Assuming this function is already defined
-        elif choice == "2":
-            honey_water_calculator()
-        elif choice == "3":
-            print("\n--- Mead Recipe Guide ---")
-            print("This feature is under development. Stay tuned!")
-        elif choice == "4":
-            print("Exiting the app. Happy brewing!")
-            break
-        else:
-            print("Invalid choice. Please select a valid option.")
+#       if choice == "1":
+#           abv_calculator()  # Assuming this function is already defined
+#       elif choice == "2":
+#           honey_water_calculator()
+#       elif choice == "3":
+#           print("\n--- Mead Recipe Guide ---")
+#           print("This feature is under development. Stay tuned!")
+#       elif choice == "4":
+#           print("Exiting the app. Happy brewing!")
+#           break
+#       else:
+#           print("Invalid choice. Please select a valid option.")
 
 # Run the app
-if __name__ == "__main__":
-    main_menu()
+# if __name__ == "__main__":
+#   main_menu()

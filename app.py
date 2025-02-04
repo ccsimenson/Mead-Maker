@@ -3,7 +3,7 @@
 
 import abv
 import honey_ratio
-
+import mead_recipes
 
 def main_menu():
     """
@@ -21,7 +21,7 @@ def main_menu():
             command=abv
         elif choice == "2":
             print("\n--- Mead Recipe Guide ---")
-            print("This feature is under development. Stay tuned!")
+            command=mead_recipes
         elif choice == "3":
             command=honey_ratio
         elif choice == "4":    
