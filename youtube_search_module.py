@@ -1,9 +1,16 @@
 from tkinter import Tk, Button, Label, Frame, Entry, StringVar, Listbox, Scrollbar, messagebox
 import webbrowser
 import threading
-import swas
+from googleapiclient.discovery import build
+
+
 # Initialize Tkinter root
 root = Tk()
+
+API_KEY = "AIzaSyBBvVIzkFgrSaT_l4qTmRzODRGeFcA3llQ"
+
+youtube = build("youtube", "v3", developerKey=API_KEY)
+
 
 # Main menu frame
 main_menu_frame = Frame(root)
@@ -11,8 +18,7 @@ Label(main_menu_frame, text="Main Menu", font=('Norse', 16)).pack(pady=10)
 Button(main_menu_frame, text="Go to YouTube Search", command=lambda: youtube_search_frame.pack(pady=20)).pack(pady=5)
 
 # YouTube API Setup (Add your API key here)
-API_KEY = "AIzaSyBBvVIzkFgrSaT_l4qTmRzODRGeFcA3llQ"
-youtube = build('youtube', 'v3', developerKey=API_KEY)
+youtube = build("youtube", "v3", developerKey=API_KEY)
 
 def search_youtube_videos(query_var, results_list, status_label, next_page_token=None):
     try:
@@ -24,6 +30,20 @@ def search_youtube_videos(query_var, results_list, status_label, next_page_token
         status_label.config(text="Searching...", fg="blue")
         
         # API request
+        threading.Thread(target=execute_search, args=(query, results_list, status_label, next_page_token)).start()
+        
+    except Exception as e:
+        status_label.config(text=f"Error: {str(e)}", fg="red")
+        
+# Execute in thread to prevent GUI freeze
+def execute_search(request, results_list):
+    try:
+        response = request.execute()
+        videos = []
+        for item in response['items']:
+            video_id = item['id']['videoId']
+def execute_search(query, results_list, status_label, next_page_token):
+    try:
         request = youtube.search().list(
             q=query,
             part="snippet",
@@ -31,42 +51,30 @@ def search_youtube_videos(query_var, results_list, status_label, next_page_token
             maxResults=10,
             pageToken=next_page_token or ""
         )
-        
-        # Execute in thread to prevent GUI freeze
-        def execute_search():
-            try:
-                response = request.execute()
-                videos = []
-                for item in response['items']:
-                    video_id = item['id']['videoId']
-                    title = item['snippet']['title']
-                    videos.append((video_id, title))
+            videos.append((video_id, title))
                 
-                results_list.delete(0, 'end')
-                for video in videos:
-                    results_list.insert('end', video[1])
+            results_list.delete(0, 'end')
+            for video in videos:
+                results_list.insert('end', video[1])
                 
-                status_label.config(text=f"Found {len(videos)} results", fg="green")
+            status_label.config(text=f"Found {len(videos)} results", fg="green")
                 
-                # Enable/disable pagination buttons
-                prev_btn = youtube_search_frame.nametowidget('prev_btn')
-                next_btn = youtube_search_frame.nametowidget('next_btn')
-                prev_btn['state'] = 'normal' if response.get('prevPageToken') else 'disabled'
-                next_btn['state'] = 'normal' if response.get('nextPageToken') else 'disabled'
+            # Enable/disable pagination buttons
+            prev_btn = youtube_search_frame.nametowidget('prev_btn')
+            next_btn = youtube_search_frame.nametowidget('next_btn')
+            prev_btn['state'] = 'normal' if response.get('prevPageToken') else 'disabled'
+            next_btn['state'] = 'normal' if response.get('nextPageToken') else 'disabled'
                 
-                # Store page tokens
-                youtube_search_frame.prev_page_token = response.get('prevPageToken')
-                youtube_search_frame.next_page_token = response.get('nextPageToken')
+            # Store page tokens
+            youtube_search_frame.prev_page_token = response.get('prevPageToken')
+            youtube_search_frame.next_page_token = response.get('nextPageToken')
                 
-            except Exception as e:
-                status_label.config(text=f"Error: {str(e)}", fg="red")
-        
-        threading.Thread(target=execute_search).start()
-        
     except Exception as e:
         status_label.config(text=f"Error: {str(e)}", fg="red")
+        
+    threading.Thread(target=execute_search).start()
 
-def open_video(event, results_list):
+def open_video(results_list):
     selection = results_list.curselection()
     if selection:
         index = selection[0]
