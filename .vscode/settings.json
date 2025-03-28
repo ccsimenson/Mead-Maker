@@ -1,0 +1,14 @@
+{
+    "python.testing.pytestArgs": [
+        "."
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "cSpell.words": [
+        "googleapiclient",
+        "padx",
+        "pady",
+        "textvariable",
+        "yscrollcommand"
+    ]
+}
